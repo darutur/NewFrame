@@ -1,10 +1,10 @@
 <?php
 
-define("URL", "http://local.framework/");
+define("URL", "http://local.framework/"); //URL do Sistema
 define("HOST", 'localhost'); //local do banco de dados - IP ou DNS
 define("PORT", '3306'); // porta para conesão do MYSQL
-define("DB_NAME", 'ddriv312_restaurante'); // nome do banco de dados
-define("USER_NAME", 'ddriv312_rest'); // usuário de conexão do banco de dados
-define("PASSWORD", 'rest@1234'); // senha do usuário de conexão do banco de dados
+define("DB_NAME", 'newframe'); // nome do banco de dados
+define("USER_NAME", 'newframe'); // usuário de conexão do banco de dados
+define("PASSWORD", 'newframe'); // senha do usuário de conexão do banco de dados
 
 ?>

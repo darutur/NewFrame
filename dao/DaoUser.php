@@ -5,77 +5,9 @@
  *
  * @author Eduardo
  */
-class DaoUsuario implements IDaoUsuario{
-
-    public function incluir(Usuario $u) {
-
-        $codAcesso = $u->getCodAcesso();
-        $nome = $u->getNome();
-        $senha = $u->getSenha();
-        $idCategUsu = $u->getIdCategUsu();
-        $idDireito = $u->getIdDireito();
-
-        $sql = "INSERT into usuario(CodAcesso,Nome,Senha,IdCategUsu,IdDireito) values "
-                . "(:codAcesso,:nome,:senha,:idCategUsu,:idDireito)";
-        $conexao = Conexao::getConexao();
-        $sth = $conexao->prepare($sql);
-        $sth->bindParam("codAcesso", $codAcesso);
-        $sth->bindParam("nome", $nome);
-        $sth->bindParam("senha", $senha);
-        $sth->bindParam("idCategUsu", $idCategUsu);
-        $sth->bindParam("idDireito", $idDireito);
-        try {
-            $sth->execute();
-            return true;
-        } catch (Exception $exc) {
-            return $exc->getTraceAsString();
-        }
-    }
-
-    public function alterar(Usuario $u) {
-        $idUsuario = $u->getIdUsuario();
-        $codAcesso = $u->getCodAcesso();
-        $nome = $u->getNome();
-        $senha = $u->getSenha();
-        $idCategUsu = $u->getIdCategUsu();
-        $idDireito = $u->getIdDireito();
-
-        $sql = "UPDATE usuario set CodAcesso=:codAcesso,"
-                . "Nome=:nome, "
-                . "Senha=:senha, "
-                . "IdCategUsu=:idCategUsu, "
-                . "IdDireito=:idDireito "
-                . "WHERE IdUsuario=:idUsuario";
-        $conexao = Conexao::getConexao();
-        $sth = $conexao->prepare($sql);
-        $sth->bindParam("idUsuario", $idUsuario);
-        $sth->bindParam("codAcesso", $codAcesso);
-        $sth->bindParam("nome", $nome);
-        $sth->bindParam("senha", $senha);
-        $sth->bindParam("idCategUsu", $idCategUsu);
-        $sth->bindParam("idDireito", $idDireito);
-        try {
-            $sth->execute();
-            return true;
-        } catch (Exception $exc) {
-            return $exc->getTraceAsString();
-        }
-    }
-
-    public function excluir(Usuario $u) {
-        $sql = "DELETE FROM usuario where IdUsuario=:idUsuario";
-        $conexao = Conexao::getConexao();
-        $sth = $conexao->prepare($sql);
-        $idUsuario = $u->getIdUsuario();
-        $sth->bindParam("idUsuario", $idUsuario);
-        try {
-            $sth->execute();
-            return true;
-        } catch (Exception $exc) {
-            return $exc->getTraceAsString();
-        }
-    }
-
+class DaoUsuario extends GenericDAO{
+    
+    
     /**
      * 
      * @return array Retorna uma array do tipo Usuario

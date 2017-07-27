@@ -5,14 +5,14 @@
  *
  * @author Eduardo
  */
-class Conexao {
+class Connection {
     private static $cnx;
     
     /**
      * 
      * @return PDO
      */
-    public static function getConexao(){
+    public static function getConnection(){
         if (!self::$cnx) {
             self::Open();
         }

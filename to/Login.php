@@ -1,6 +1,4 @@
 <?php
-//não retirar esta linha
-date_default_timezone_set("Brazil/East");
 /**
  * Description of Login
  *
@@ -8,12 +6,12 @@ date_default_timezone_set("Brazil/East");
  */
 class Login {
 
-    public function autenticar() {
-        $v = new TGui("formularioDeLogin");
+    public function login() {
+        $v = new TGui("formLogin");
         $v->renderizarLogin();
     }
 
-    public function confirmarAutenticacao() {
+    public function confirmEnter() {
         $login = isset($_POST['login']) ? $_POST['login'] : FALSE;
         $senha = isset($_POST['password']) ? $_POST['password'] : FALSE;
 
