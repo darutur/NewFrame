@@ -158,6 +158,67 @@ class GenericDAO {
             return 0;
         }
     }
+    
+    /**
+     * 
+     * @param type $orderField Column name
+     * @param type $orderType 1 for DESC or 2 for ASC
+     * @return Class
+     */
+    public function listAll($orderField, $orderType) {
+
+        if ($orderType == 1){
+            $type = "DESC";
+        }
+        else{
+            $type = "ASC";
+        }
+
+        $sql = "SELECT * FROM " . $this->table . " ORDER BY " . $orderField . " " .$type;
+
+        $con = Connection::getConnection();
+        $sth = $con->prepare($sql);
+
+        try {
+            $sth->execute();
+        } catch (PDOException $e) {
+            GlobalFunctions::logMsg($e, "listAll_" . $this->table);
+            return 0;
+        }
+
+        $array = array();
+        //O nome que está em "fetchObject" tem que ser o mesmo nome da classe
+        while ($obj = $sth->fetchObject(get_class($this))) {
+            $array[] = $obj;
+        }
+        return $array;
+    }
+    
+    /**
+     * 
+     * @param type $id ID value
+     * @return Class
+     */
+    public function listForID($id) {
+
+        if(empty($id)){
+            $id = $this->primaryKey;
+        }            
+        
+        $sql = "SELECT * FROM " . $this->table . " WHERE " . $this->namePrimaryKey . " = " . $id;
+
+        $con = Connection::getConnection();
+        $sth = $con->prepare($sql);
+        $sth->bindParam(":" . $this->namePrimaryKey, $id);
+
+        try {
+            $sth->execute();
+            return $sth->fetchObject(get_class($this));
+        } catch (PDOException $e) {
+            GlobalFunctions::logMsg($e, "listForID_" . $this->table);
+            return 0;
+        }
+    }
 
 }
 
