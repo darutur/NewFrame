@@ -63,7 +63,7 @@ class GenericDAO {
      * 	Crud methods
      *
      * */
-    public function insert($array) {
+    public function insertDAO($array) {
 
         // Preparing fields and values
         foreach ($array as $key => $value) {
@@ -79,21 +79,24 @@ class GenericDAO {
             }
         }
 
-        $sql = "INSERT INTO " . $this->table . " (" . $this->campos . ") VALUES(" . $this->valor . ")";
+        $sql = "INSERT INTO " . $this->table . " (" . $this->field . ") VALUES(" . $this->value . ")";
 
         $con = Connection::getConnection();
         $sth = $con->prepare($sql);
 
         //executing bind
-        foreach ($array as $key => $value) {
-            $sth->bindParam(":" . $key, $value);
+        foreach ($array as $key => &$value) {
+            if (!($key == $this->namePrimaryKey)) {
+                $sth->bindParam($key, $value);
+            }
         }
 
         try {
             $con->beginTransaction();
             $sth->execute();
+            $lastID = $con->lastInsertId();
             $con->commit();
-            $con->lastInsertId();
+            return $lastID;
         } catch (PDOException $e) {
             $con->rollBack();
             GlobalFunctions::logMsg($e, "insert_" . $this->table);
@@ -101,7 +104,7 @@ class GenericDAO {
         }
     }
 
-    public function update($array) {
+    public function updateDAO($array) {
 
         $sql = "UPDATE " . $this->table . " SET ";
 
@@ -121,17 +124,20 @@ class GenericDAO {
         $con = Connection::getConnection();
         $sth = $con->prepare($sql);
 
-        $sth->bindParam(":" . $this->namePrimaryKey, $this->primaryKey);
+        $sth->bindParam($this->namePrimaryKey, $this->primaryKey);
 
         //executando o bind
-        foreach ($array as $key => $value) {
-            $sth->bindParam(":" . $key, $value);
+        foreach ($array as $key => &$value) {
+            if (!($key == $this->namePrimaryKey)) {
+                $sth->bindParam($key, $value);
+            }
         }
 
         try {
             $con->beginTransaction();
             $sth->execute();
             $con->commit();
+            return 1;
         } catch (PDOException $e) {
             $con->rollBack();
             GlobalFunctions::logMsg($e, "update_" . $this->table);
@@ -139,42 +145,42 @@ class GenericDAO {
         }
     }
 
-    public function delete() {
+    public function deleteDAO() {
 
         $sql = "DELETE FROM " . $this->table . " WHERE " . $this->namePrimaryKey . " = :" . $this->namePrimaryKey;
 
         $con = Connection::getConnection();
         $sth = $con->prepare($sql);
-        
-        $sth->bindParam(":" . $this->namePrimaryKey, $this->primaryKey);
+
+        $sth->bindParam($this->namePrimaryKey, $this->primaryKey);
 
         try {
             $con->beginTransaction();
             $sth->execute();
             $con->commit();
+            return 1;
         } catch (PDOException $e) {
             $con->rollBack();
             GlobalFunctions::logMsg($e, "delete_" . $this->table);
             return 0;
         }
     }
-    
+
     /**
      * 
      * @param type $orderField Column name
      * @param type $orderType 1 for DESC or 2 for ASC
      * @return Class
      */
-    public function listAll($orderField, $orderType) {
-
-        if ($orderType == 1){
+    public function listAll($orderField, $orderType = 0) {
+        
+        if ($orderType == 1) {
             $type = "DESC";
-        }
-        else{
+        } else {
             $type = "ASC";
         }
 
-        $sql = "SELECT * FROM " . $this->table . " ORDER BY " . $orderField . " " .$type;
+        $sql = "SELECT * FROM " . $this->table . " ORDER BY " . $orderField . " " . $type;
 
         $con = Connection::getConnection();
         $sth = $con->prepare($sql);
@@ -193,7 +199,7 @@ class GenericDAO {
         }
         return $array;
     }
-    
+
     /**
      * 
      * @param type $id ID value
@@ -201,15 +207,15 @@ class GenericDAO {
      */
     public function listForID($id) {
 
-        if(empty($id)){
+        if (empty($id)) {
             $id = $this->primaryKey;
-        }            
-        
+        }
+
         $sql = "SELECT * FROM " . $this->table . " WHERE " . $this->namePrimaryKey . " = " . $id;
 
         $con = Connection::getConnection();
         $sth = $con->prepare($sql);
-        $sth->bindParam(":" . $this->namePrimaryKey, $id);
+        $sth->bindParam($this->namePrimaryKey, $id);
 
         try {
             $sth->execute();

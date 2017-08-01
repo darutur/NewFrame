@@ -20,7 +20,7 @@ class TGui {
         if (file_exists("../gui/" . $this->nome . ".php")) {
             include_once "../gui/" . $this->nome . ".php";
         } else {
-            //erro
+            echo "<img src='". URL ."site/img/erro-404.jpg' />";
         }
         include_once './gui/Rodape.php';
     }
@@ -29,7 +29,7 @@ class TGui {
         if (file_exists("../gui/" . $this->nome . ".php")) {
             include_once "../gui/" . $this->nome . ".php";
         } else {
-            //erro
+            echo "<img src='". URL ."site/img/erro-404.jpg' />";
         }
     }
 

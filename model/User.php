@@ -7,46 +7,46 @@
  */
 class User extends GenericDAO {
 
-    const table = "nameTable"; //required attribute
-    const namePrimaryKey = "namePrimaryKey"; //required attribute
+    const table = "usuario"; //required attribute
+    const namePrimaryKey = "idUsuario"; //required attribute
 
-    private $IdUsuario;
-    private $CodAcesso;
-    private $Nome;
-    private $Senha;
+    private $idUsuario;
+    private $codAcesso;
+    private $nome;
+    private $senha;
 
     function getIdUsuario() {
-        return $this->IdUsuario;
+        return $this->idUsuario;
     }
 
     function getCodAcesso() {
-        return $this->CodAcesso;
+        return $this->codAcesso;
     }
 
     function getNome() {
-        return $this->Nome;
+        return $this->nome;
     }
 
     function getSenha() {
-        return $this->Senha;
+        return $this->senha;
     }
 
-    function setIdUsuario($IdUsuario) {
-        $this->IdUsuario = $IdUsuario;
+    function setIdUsuario($idUsuario) {
+        $this->idUsuario = $idUsuario;
     }
 
-    function setCodAcesso($CodAcesso) {
-        $this->CodAcesso = $CodAcesso;
+    function setCodAcesso($codAcesso) {
+        $this->codAcesso = $codAcesso;
     }
 
-    function setNome($Nome) {
-        $this->Nome = $Nome;
+    function setNome($nome) {
+        $this->nome = $nome;
     }
 
-    function setSenha($Senha) {
-        $this->Senha = $Senha;
+    function setSenha($senha) {
+        $this->senha = $senha;
     }
-
+    
     /**
      * Methods that have to be standard for all models
      */
@@ -61,7 +61,7 @@ class User extends GenericDAO {
      */
     public function insert() {
         $this->__construct();
-        parent::insert(get_object_vars($this));
+        return parent::insertDAO(get_object_vars($this));
     }
 
     /**
@@ -69,7 +69,7 @@ class User extends GenericDAO {
      */
     public function update() {
         $this->__construct();
-        parent::update(get_object_vars($this));
+        return parent::updateDAO(get_object_vars($this));
     }
 
     /**
@@ -77,7 +77,7 @@ class User extends GenericDAO {
      */
     public function delete() {
         $this->__construct();
-        parent::delete(get_object_vars($this));
+        return parent::deleteDAO(get_object_vars($this));
     }
-
+    
 }

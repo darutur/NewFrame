@@ -13,9 +13,9 @@ class TApp {
 
     public function __construct() {
         $url = isset($_GET['url']) ? $_GET['url'] : false;
-        $url = rtrim($url, "/"); 
+        $url = rtrim($url, "/");
         if ($url) {
-            
+
             // cadasrto-de-pessoas / listar-por-codigo / 10
             $arr = explode('/', $url);
             if (isset($arr[0])) {
@@ -23,7 +23,7 @@ class TApp {
                 $to = strtolower($arr[0]);
                 $to = explode('-', $to);
                 $strTo = '';
-                
+
                 foreach ($to as $k => $v) {
                     $strTo .= strtoupper(substr($v, 0, 1)) . substr($v, 1);
                 }
@@ -59,9 +59,12 @@ class TApp {
     }
 
     public function executar() {
+
+
         if (class_exists($this->to)) {
             try {
                 $c = new $this->to();
+
                 // A classe IPrivateTO é responsável por informar quem
                 // está logado ou não
                 if ($c instanceof IPrivateTO) {
@@ -69,13 +72,13 @@ class TApp {
                     $sessao = isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : FALSE;
                     if (!$sessao || trim($sessao) == "") {
                         //página de login quando não está logado
-                        header("location: ". URL ."login/autenticar");
+                        header("location: " . URL . "login/access");
                     }
                 }
                 if (method_exists($c, $this->metodo)) {
                     if ($this->params != NULL) {
                         $c->{$this->metodo}($this->params);
-                    }else{
+                    } else {
                         $c->{$this->metodo}();
                     }
                 } else {
@@ -86,7 +89,7 @@ class TApp {
             }
         } else {
             // tratar erro
-            echo "<img src='". URL ."site/img/erro-404.jpg' />";
+            echo "<img src='" . URL . "site/img/erro-404.jpg' />";
         }
     }
 

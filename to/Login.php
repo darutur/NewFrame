@@ -6,7 +6,7 @@
  */
 class Login {
 
-    public function login() {
+    public function access() {
         $v = new TGui("formLogin");
         $v->renderizarLogin();
     }

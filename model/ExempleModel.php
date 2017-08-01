@@ -48,7 +48,7 @@ class ExcempleModel extends GenericDAO {
      */
     public function insert() {
         $this->__construct();
-        parent::insert(get_object_vars($this));
+        return parent::insertDAO(get_object_vars($this));
     }
 
     /**
@@ -56,7 +56,7 @@ class ExcempleModel extends GenericDAO {
      */
     public function update() {
         $this->__construct();
-        parent::update(get_object_vars($this));
+        return parent::updateDAO(get_object_vars($this));
     }
 
     /**
@@ -64,7 +64,7 @@ class ExcempleModel extends GenericDAO {
      */
     public function delete() {
         $this->__construct();
-        parent::delete(get_object_vars($this));
+        return parent::deleteDAO(get_object_vars($this));
     }
 
 }
