@@ -17,6 +17,7 @@ function __autoload($c) {
         '../',
         '../dao/',
         '../libs/',
+        '../libs/sql/',
         '../model/',
         '../static/',
         '../to/',

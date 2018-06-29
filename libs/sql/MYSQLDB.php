@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Método responsável pela conexão com o banco de dados
+ */
 abstract class MYSQLDB extends PDO {
 
     private $conn;
@@ -16,8 +19,8 @@ abstract class MYSQLDB extends PDO {
 
     /**
      * Responsável por retornar a chave do último item no array
-     * @param type $array 
-     * @return type String
+     * @param Array $array 
+     * @return String
      */
     private function endKey($array) {
         end($array);
@@ -26,8 +29,8 @@ abstract class MYSQLDB extends PDO {
 
     /**
      * Método para dar bind em vários parâmetros
-     * @param type $statement
-     * @param type $parameters 
+     * @param Statement $statement Passar o Statement
+     * @param Array $parameters Parâmetros para a query
      */
     private function setParams($statement, $parameters = array()) {
 
@@ -38,9 +41,9 @@ abstract class MYSQLDB extends PDO {
 
     /**
      * Método para dar bind em somente um parâmetro
-     * @param type $statement Passar o Statement
-     * @param type $key Nome do campo do parâmetro
-     * @param type $value Valor do campo do parâmetro
+     * @param Statement $statement Passar o Statement
+     * @param String $key Nome do campo do parâmetro
+     * @param String $value Valor do campo do parâmetro
      */
     private function setParam($statement, $key, $value) {
 
@@ -55,9 +58,9 @@ abstract class MYSQLDB extends PDO {
     /**
      * Este método é mais utilizado quando se deseja passar a query bruta 
      * com o retorno de um linha de resultado ou uma resposta
-     * @param type $rawQuery Query bruta em SQL
-     * @param type $params Parâmetros para a query
-     * @return array resultado de execução (Statement)
+     * @param String $rawQuery Query bruta em SQL
+     * @param Array $params Parâmetros para a query
+     * @return Array Retorna o Statement do resultado de execução
      */
     public function queryOnly($rawQuery, $params = array()) {
 
@@ -71,26 +74,38 @@ abstract class MYSQLDB extends PDO {
     /**
      * Este método é mais utilizado quando se deseja passar a query bruta 
      * com o retorno de várias linhas no resultado
-     * @param type $rawQuery Query bruta em SQL
-     * @param type $params Parâmetros para a query
-     * @return array Lista do resultado
+     * @param String $rawQuery Query bruta em SQL
+     * @param Array $params Parâmetros para a query
+     * @param String $className Informando o nome da classe
+     * @return Array Lista do resultado
      */
-    public function queryMany($rawQuery, $params = array()): array {
+    public function queryMany($rawQuery, $params = array(), $className = "") {
 
         $stmt = $this->queryOnly($rawQuery, $params);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($className)) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            while ($obj = $stmt->fetchObject($className)) {
+                $array[] = $obj;
+            }
+            if (count($array) > 1) {
+                return $array;
+            } else{
+                return $array[0];
+            }
+        }
     }
 
     /**
      * Método responsável por realizar a inserção de dados no banco de dados
-     * @param type $table Nome da tabéla no banco
-     * @param type $parameters Parâmetros para a query 
-     * @return type array Lista do resultado
+     * @param String $table Nome da tabéla no banco
+     * @param Array $parameters Parâmetros para a query 
+     * @return INT Retorna 0 se ocorrer algum erro, senão o ID da inserção
      */
-    public function insert($table, $parameters = array()) {
+    public function insert($table, $parameters): int {
 
-        $rawQuery = "INSERT INTO " .$table. " (";
+        $rawQuery = "INSERT INTO " . $table . " (";
 
         foreach ($parameters as $key => $value) {
             if ($key == $this->endKey($parameters)) {
@@ -110,85 +125,114 @@ abstract class MYSQLDB extends PDO {
             }
         }
 
-        return $this->queryOnly($rawQuery, $parameters);
+        $this->$conn->beginTransaction();
+        try {
+            $this->queryOnly($rawQuery, $parameters);
+            $lastID = $this->$conn->lastInsertId();
+            $this->$conn->commit();
+
+            return $lastID;
+        } catch (PDOException $e) {
+            $this->$conn->rollBack();
+            GlobalFunctions::logMsg($e, "insert_" . $table);
+            return 0;
+        }
     }
-    
+
     /**
      * Método responsável por realizar a alteração de dados no banco de dados
-     * @param type $table Nome da tabela
-     * @param type $parameters Parâmetros para a query 
-     * @param type $condition Informar a chave primária e o seu valor
-     * @return type array Lista do resultado
+     * @param String $table Nome da tabela
+     * @param Array $parameters Parâmetros para a query 
+     * @param Array $condition Informar a chave primária e o seu valor
+     * @return Bool
      */
-    public function update($table, $parameters = array(), $condition = array()){
+    public function update($table, $parameters, $condition): bool {
 
-    	$rawQuery = "UPDATE " .$table. " SET ";
+        $rawQuery = "UPDATE " . $table . " SET ";
 
-    	foreach ($parameters as $key => $value) {
-    		if ($key == $this->endKey($campos)) {
-    			$rawQuery .= $key. " = :" .$key;
-    		} else{
-    			$rawQuery .= $key. " = :" .$key. ", ";
-    		}
-    	}
-
-    	$rawQuery.= " WHERE " .key($condition). " = :" .key($condition);
-        
-        $mergeParameters = array_merge($parameters, $condition);
-
-        return $this->queryOnly($rawQuery, $mergeParameters);
-    
-    }
-    
-    /**
-     * Método responsável por realizar a deleção de dados no banco de dados
-     * @param type $table Nome da tabela
-     * @param type $condition Informar a chave primária e o seu valor
-     * @return type array Lista do resultado
-     */
-    public function delete($table, $condition = array()){
-
-    	$rawQuery = "DELETE FROM " .$table. " WHERE " .key($condition). " = :" .key($condition);
-
-    	return $this->queryOnly($rawQuery, $condition);
-        
-    }
-    
-    /**
-     * Método responsável por retornar todos os dados de uma tabela
-     * @param type $table Nome da tabela
-     * @param type $orderBy Informar o campo que deseja ordenação
-     * @return type array Lista do resultado
-     */
-    public function selectAll($table, $orderBy = "") {
-        
-        if(empty($orderBy)){
-            $rawQuery = "SELECT * FROM " .$table. " ORDER BY " .$orderBy;
-        } else{
-            $rawQuery = "SELECT * FROM " .$table;
+        foreach ($parameters as $key => $value) {
+            if ($key == $this->endKey($campos)) {
+                $rawQuery .= $key . " = :" . $key;
+            } else {
+                $rawQuery .= $key . " = :" . $key . ", ";
+            }
         }
 
-    	return $this->queryMany($rawQuery);
-        
+        $rawQuery .= " WHERE " . key($condition) . " = :" . key($condition);
+
+        $mergeParameters = array_merge($parameters, $condition);
+
+        $this->$conn->beginTransaction();
+        try {
+            $this->queryOnly($rawQuery, $mergeParameters);
+            $this->$conn->commit();
+
+            return TRUE;
+        } catch (PDOException $e) {
+            $this->$conn->rollBack();
+            GlobalFunctions::logMsg($e, "update_" . $table);
+            return FALSE;
+        }
     }
-    
+
+    /**
+     * Método responsável por realizar a deleção de dados no banco de dados
+     * @param String $table Nome da tabela
+     * @param Array $condition Informar a chave primária e o seu valor
+     * @return Bool
+     */
+    public function delete($table, $condition): bool {
+
+        $rawQuery = "DELETE FROM " . $table . " WHERE " . key($condition) . " = :" . key($condition);
+
+        $this->$conn->beginTransaction();
+        try {
+            $this->queryOnly($rawQuery, $condition);
+            $this->$conn->commit();
+            return TRUE;
+        } catch (PDOException $e) {
+            $this->$conn->rollBack();
+            GlobalFunctions::logMsg($e, "delete_" . $table);
+            return FALSE;
+        }
+    }
+
+    /**
+     * Método responsável por retornar todos os dados de uma tabela
+     * @param String $table Nome da tabela
+     * @param String $orderBy Informar o campo que deseja ordenação
+     * @param String $className Informando o nome da classe
+     * @return Array Lista do resultado
+     */
+    public function selectAll($table, $orderBy = "", $className = "") {
+
+        if (empty($orderBy)) {
+            $rawQuery = "SELECT * FROM " . $table;
+        } else {
+            $rawQuery = "SELECT * FROM " . $table . " ORDER BY " . $orderBy;
+        }
+
+        return $this->queryMany($rawQuery, array(), $className);
+    }
+
     /**
      * Método responsável por retornar os dados de uma tabela conforme sua
      * condição
-     * @param type $table Nome da tabela
-     * @param type $condition Informar a condição que deseja
-     * @param type $orderBy Informar o campo que deseja ordenação
-     * @return type array Lista do resultado
+     * @param String $table Nome da tabela
+     * @param Array $condition Informar a condição que deseja
+     * @param String $className Informando o nome da classe
+     * @param String $orderBy Informar o campo que deseja ordenação
+     * @return Array Lista do resultado
      */
-    public function selectOneCondition($table, $condition = array(), $orderBy = "") {
-        
-        if(empty($orderBy)){
-            $rawQuery = "SELECT * FROM " .$table. " WHERE " .key($condition). " = :" .key($condition). " ORDER BY " .$orderBy;
-        } else{
-            $rawQuery = "SELECT * FROM " .$table. " WHERE " .key($condition). " = :" .key($condition). " ORDER BY " .key($condition);
+    public function selectOneCondition($table, $condition, $className = "", $orderBy = "") {
+
+        if (empty($orderBy)) {
+            $rawQuery = "SELECT * FROM " . $table . " WHERE " . key($condition) . " = :" . key($condition) . " ORDER BY " . key($condition);
+        } else {
+            $rawQuery = "SELECT * FROM " . $table . " WHERE " . key($condition) . " = :" . key($condition) . " ORDER BY " . $orderBy;
         }
-        
-    	return $this->queryMany($rawQuery, $condition);
+
+        return $this->queryMany($rawQuery, $condition, $className);
     }
 
 }
