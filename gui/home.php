@@ -7,3 +7,6 @@
  */
 
 echo "home";
+?>
+
+<a href="/login/logout">Sair</a>
