@@ -125,15 +125,15 @@ abstract class MYSQLDB extends PDO {
             }
         }
 
-        $this->$conn->beginTransaction();
+        $this->conn->beginTransaction();
         try {
             $this->queryOnly($rawQuery, $parameters);
-            $lastID = $this->$conn->lastInsertId();
-            $this->$conn->commit();
+            $lastID = $this->conn->lastInsertId();
+            $this->conn->commit();
 
             return $lastID;
         } catch (PDOException $e) {
-            $this->$conn->rollBack();
+            $this->conn->rollBack();
             GlobalFunctions::logMsg($e, "insert_" . $table);
             return 0;
         }
@@ -151,7 +151,7 @@ abstract class MYSQLDB extends PDO {
         $rawQuery = "UPDATE " . $table . " SET ";
 
         foreach ($parameters as $key => $value) {
-            if ($key == $this->endKey($campos)) {
+            if ($key == $this->endKey($parameters)) {
                 $rawQuery .= $key . " = :" . $key;
             } else {
                 $rawQuery .= $key . " = :" . $key . ", ";
@@ -162,14 +162,14 @@ abstract class MYSQLDB extends PDO {
 
         $mergeParameters = array_merge($parameters, $condition);
 
-        $this->$conn->beginTransaction();
+        $this->conn->beginTransaction();
         try {
             $this->queryOnly($rawQuery, $mergeParameters);
-            $this->$conn->commit();
+            $this->conn->commit();
 
             return TRUE;
         } catch (PDOException $e) {
-            $this->$conn->rollBack();
+            $this->conn->rollBack();
             GlobalFunctions::logMsg($e, "update_" . $table);
             return FALSE;
         }
@@ -185,13 +185,13 @@ abstract class MYSQLDB extends PDO {
 
         $rawQuery = "DELETE FROM " . $table . " WHERE " . key($condition) . " = :" . key($condition);
 
-        $this->$conn->beginTransaction();
+        $this->conn->beginTransaction();
         try {
             $this->queryOnly($rawQuery, $condition);
-            $this->$conn->commit();
+            $this->conn->commit();
             return TRUE;
         } catch (PDOException $e) {
-            $this->$conn->rollBack();
+            $this->conn->rollBack();
             GlobalFunctions::logMsg($e, "delete_" . $table);
             return FALSE;
         }

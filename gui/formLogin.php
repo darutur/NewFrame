@@ -27,9 +27,4 @@ echo "<pre>";
 print_r($user->listarTodos());
 echo "</pre>";
 
-$user->setIdUsuario(5);
 
-echo "<pre>";
-print_r($user->listarPorId());
-echo "</pre>";
-?>
