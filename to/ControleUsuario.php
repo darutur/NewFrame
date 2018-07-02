@@ -1,12 +1,16 @@
 <?php
-//não retirar esta linha
-date_default_timezone_set("Brazil/East");
+
 /**
  * Description of ControleUsuario
  *
  * @author Eduardo
  */
 class ControleUsuario implements IPrivateTO {
+
+    public function home() {
+        $v = new TGui("home");
+        $v->renderizarInterno();
+    }
 
     public function lista() {
         $du = new DaoUsuario();
@@ -25,19 +29,11 @@ class ControleUsuario implements IPrivateTO {
     }
 
     public function editar($id) {
-        $p1 = $id[2];
-        $du = new DaoUsuario();
-        $usuario = $du->listarPorId($p1);
-        $v = new TGui("formularioUsuario");
-        $v->addDados("usuario", $usuario);
-        $v->renderizarInterno();
+        
     }
 
     public function novo() {
-        $usuario = new Usuario();
-        $v = new TGui("formularioUsuario");
-        $v->addDados("usuario", $usuario);
-        $v->renderizarInterno();
+        
     }
 
     public function salvar() {
@@ -59,14 +55,14 @@ class ControleUsuario implements IPrivateTO {
         if (!$categoria || trim($categoria) == "") {
             throw new Exception("O campo Categoria é obrigatório.");
         }
-        
+
         $direito = isset($_POST['direito']) ? $_POST['direito'] : FALSE;
         if (!$direito || trim($direito) == "") {
             throw new Exception("O campo Direito é obrigatório.");
         }
 
         $senha = isset($_POST['senha']) ? $_POST['senha'] : FALSE;
-        
+
 
 
         // setando os dados em uma variável usuário
@@ -104,18 +100,7 @@ class ControleUsuario implements IPrivateTO {
     }
 
     public function excluir() {
-        $id = isset($_POST['id']) ? $_POST['id'] : FALSE;
-        if ($id) {
-            $du = new DaoUsuario();
-            $usuario = $du->listarPorId($id);
-            if ($du->excluir($usuario)) {
-                header('location: ' . URL . 'controle-usuario/lista');
-            } else {
-                echo 'Não foi possível excluir o usuário!';
-            }
-        } else {
-            header('location: ' . URL . 'controle-usuario/lista/' . $id);
-        }
+        
     }
 
 }

@@ -51,9 +51,9 @@ class TApp {
 
             $this->params = $arr;
         } else {
-            //primeira página inicial depois que logar
+            //página inicial depois que logar
             $this->to = 'ControleUsuario';
-            $this->metodo = 'autenticar';
+            $this->metodo = 'home';
             $this->params = null;
         }
     }
@@ -82,7 +82,8 @@ class TApp {
                         $c->{$this->metodo}();
                     }
                 } else {
-                    //tratar erro
+                    // tratar erro
+                    echo "<img src='" . URL . "site/img/erro-404.jpg' />";
                 }
             } catch (Exception $ex) {
                 echo $ex->getTraceAsString();

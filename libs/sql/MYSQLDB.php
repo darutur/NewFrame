@@ -86,13 +86,16 @@ abstract class MYSQLDB extends PDO {
         if (empty($className)) {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
+            $array = array();
             while ($obj = $stmt->fetchObject($className)) {
                 $array[] = $obj;
             }
             if (count($array) > 1) {
                 return $array;
-            } else{
+            } else if(count($array) == 1){
                 return $array[0];
+            } else{
+                return $array;
             }
         }
     }

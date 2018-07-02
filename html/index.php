@@ -21,7 +21,8 @@ function __autoload($c) {
         '../model/',
         '../static/',
         '../to/',
-        '../gui/'
+        '../gui/',
+        '../gui/static'
     );
 
     foreach ($diretorios as $dir) {

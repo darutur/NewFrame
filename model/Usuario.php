@@ -114,10 +114,23 @@ class Usuario extends MYSQLDB {
      * Este método retorna um Usuário
      * @return \Usuario Array de Usuário
      */
-    public function listarPorId(): Usuario{
+    public function listarPorId(){
         
         //criando a condição
         $condicao = array("idUsuario"=> $this->getIdUsuario());
+        
+        return parent::selectOneCondition(self::tabela, $condicao, get_class($this));
+        
+    }
+    
+    /**
+     * Este método retorna um Usuário
+     * @return \Usuario Array de Usuário
+     */
+    public function listarPorLogin(){
+        
+        //criando a condição
+        $condicao = array("login"=> $this->getLogin());
         
         return parent::selectOneCondition(self::tabela, $condicao, get_class($this));
         

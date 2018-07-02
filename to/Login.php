@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Description of Login
  *
@@ -11,35 +12,51 @@ class Login {
         $v->renderizarExterno();
     }
 
-    public function confirmEnter() {
-        $login = isset($_POST['login']) ? $_POST['login'] : FALSE;
+    public function autenticar() {
+        $login = isset($_POST['user']) ? $_POST['user'] : FALSE;
         $senha = isset($_POST['password']) ? $_POST['password'] : FALSE;
 
-        if (!$login || !$senha) {
-            echo "login ou senha incorreto";
-            return false;
-        }
+        $du = new Usuario();
+        $du->setLogin($login);
+        $ret = $du->listarPorLogin();
 
-        $du = new DaoUsuario();
-        $ret = $du->autenticar($login, $senha);
+        echo '<pre>';
+        print_r($ret);
+        echo '</pre>';
 
-        if ($ret || trim($ret) != "") {
-            $usu = $du->listarPorId($ret);
-            $idUsuario = $usu->getIdUsuario();
-            $nome = $usu->getNome();
-            $idCategUsu = $usu->getIdCategUsu();
-            $idDirUsu = $usu->getIdDireito();
-            session_start();
-            $_SESSION['idUsuario'] = $idUsuario;
-            $_SESSION['usuario'] = $nome;
-            $_SESSION['categoriaUsu'] = $idCategUsu;
-            $_SESSION['direitoUsu'] = $idDirUsu;
-            header("location: " . URL);
-        } else {
+        if (empty($ret)) {
             session_start();
             session_destroy();
             header("location: " . URL);
+        } else {
+            if ($ret->getSenha() == $senha) {
+                $idUsuario = $ret->getIdUsuario();
+                $nome = $ret->getLogin();
+                session_start();
+                $_SESSION['idUsuario'] = $idUsuario;
+                $_SESSION['usuario'] = $nome;
+                header("location: " . URL);
+            } else {
+                session_start();
+                session_destroy();
+                header("location: " . URL);
+            }
         }
+//        if ($ret || trim($ret) != "") {
+//            $usu = $du->listarPorId($ret);
+//            $idUsuario = $usu->getIdUsuario();
+//            $nome = $usu->getNome();
+//            $idCategUsu = $usu->getIdCategUsu();
+//            $idDirUsu = $usu->getIdDireito();
+//            session_start();
+//            $_SESSION['idUsuario'] = $idUsuario;
+//            $_SESSION['usuario'] = $nome;
+//            $_SESSION['categoriaUsu'] = $idCategUsu;
+//            $_SESSION['direitoUsu'] = $idDirUsu;
+//            header("location: " . URL);
+//        } else {
+//            
+//        }
     }
 
     public function logout() {
