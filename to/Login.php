@@ -8,7 +8,7 @@ class Login {
 
     public function access() {
         $v = new TGui("formLogin");
-        $v->renderizarLogin();
+        $v->renderizarExterno();
     }
 
     public function confirmEnter() {

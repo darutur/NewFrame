@@ -15,7 +15,7 @@ class TGui {
         $this->dados = array();
     }
 
-    public function renderizar() {
+    public function renderizarInterno() {
         include_once '../gui/Cabec.php';
         if (file_exists("../gui/" . $this->nome . ".php")) {
             include_once "../gui/" . $this->nome . ".php";
@@ -25,7 +25,7 @@ class TGui {
         include_once './gui/Rodape.php';
     }
     
-    public function renderizarLogin() {
+    public function renderizarExterno() {
         if (file_exists("../gui/" . $this->nome . ".php")) {
             include_once "../gui/" . $this->nome . ".php";
         } else {

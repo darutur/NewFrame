@@ -20,7 +20,7 @@ class ControleUsuario implements IPrivateTO {
             $usuarios = $du->pesquisa($pesquisa);
             $v = new TGui("listaDeUsuarios");
             $v->addDados("usuarios", $usuarios);
-            $v->renderizar();
+            $v->renderizarInterno();
         }
     }
 
@@ -30,14 +30,14 @@ class ControleUsuario implements IPrivateTO {
         $usuario = $du->listarPorId($p1);
         $v = new TGui("formularioUsuario");
         $v->addDados("usuario", $usuario);
-        $v->renderizar();
+        $v->renderizarInterno();
     }
 
     public function novo() {
         $usuario = new Usuario();
         $v = new TGui("formularioUsuario");
         $v->addDados("usuario", $usuario);
-        $v->renderizar();
+        $v->renderizarInterno();
     }
 
     public function salvar() {
